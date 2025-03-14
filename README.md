@@ -31,6 +31,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Tools
 
+- [Papaparse](https://www.papaparse.com/) - parse CSV file
 - [ShadCN](https://ui.shadcn.com/) - for UI
 - [Recharts](https://recharts.org/) - A composable charting library built on React components.
 
