@@ -30,8 +30,8 @@ To learn more about Next.js, take a look at the following resources:
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
 ## Tools
-- [ShadCN](https://ui.shadcn.com/): for UI
-- [Recharts](https://recharts.org/): A composable charting library built on React components.
+- [ShadCN](https://ui.shadcn.com/) - for UI
+- [Recharts](https://recharts.org/) - A composable charting library built on React components.
 
 ## Deploy on Vercel
 
