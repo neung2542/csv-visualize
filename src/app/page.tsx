@@ -12,7 +12,7 @@ export default function Home() {
         {/* <ThemeToggle /> */}
       </div>
       <p className="text-center text-muted-foreground mb-8">Upload a CSV file to visualize and analyze your data</p>
-
+     
       <div className="max-w-8xl mx-auto">
         <FileUploader />
 

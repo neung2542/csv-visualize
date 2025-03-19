@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import DataTable from "./data-table";
 import Papa from "papaparse";
-import DataCharts from "./data-charts"
+import DataCharts from "./data-charts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // import { useToast } from "@/hooks/use-toast"
@@ -45,8 +45,8 @@ export default function FileUploader() {
       Papa.parse(file, {
         header: true,
         skipEmptyLines: true,
-        delimiter: ',',
-        complete: (results: { data: any; errors: any; }) => {
+        delimiter: ",",
+        complete: (results: { data: any; errors: any }) => {
           const { data, errors } = results;
           if (errors.length) {
             console.error("Error parsing CSV:", errors);
@@ -63,6 +63,44 @@ export default function FileUploader() {
     } catch (error) {
       console.error("Error reading file:", error);
       setError("Failed to read the file. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSampleFile = async () => {
+    setIsLoading(true);
+    setError(null);
+    setVisibleRows(0);
+
+    try {
+      const response = await fetch("/sample_data.csv");
+      const text = await response.text();
+      setFile(new File([text], "sample_data.csv"));
+
+      Papa.parse(text, {
+        header: true,
+        skipEmptyLines: true,
+        delimiter: ",",
+        complete: (results: { data: any; errors: any }) => {
+          const { data, errors } = results;
+          if (errors.length) {
+            console.error("Error parsing CSV:", errors);
+            setError("Failed to parse sample CSV file. Please check the format.");
+            setIsLoading(false);
+            return;
+          }
+
+          const headers = Object.keys(data[0]);
+          setHeaders(headers);
+          setCsvData(data);
+          console.log(data);
+          
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching sample file:", error);
+      setError("Failed to fetch the sample file. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -89,26 +127,35 @@ export default function FileUploader() {
   return (
     <div className="w-full">
       <div className={"text-center flex justify-center mb-8"}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileInput}
-            accept=".csv"
-            className="hidden"
-          />
-          <Button
-            variant="secondary"
-            type="button"
-            className="flex items-center justify-center cursor-pointer"
-            size="lg"
-            // onDrop={handleDrop}
-            onClick={handleButtonClick}
-          >
-            Select CSV File
-          </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileInput}
+          accept=".csv"
+          className="hidden"
+        />
+        <Button
+          variant="secondary"
+          type="button"
+          className="flex items-center justify-center cursor-pointer"
+          size="lg"
+          // onDrop={handleDrop}
+          onClick={handleButtonClick}
+        >
+          Select CSV File
+        </Button>
+      </div>
+      <p className="text-center text-muted-foreground mb-8">Or</p>
+      <div className="flex justify-center items-center">
+        <div
+          className="text-muted-foreground cursor-pointer"
+          onClick={handleSampleFile}
+        >
+          Use Sample CSV
         </div>
+      </div>
       {file && (
-        <div className="md:p-6" >
+        <div className="md:p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
               <div className="bg-primary/10 p-2 rounded-full mr-3">
@@ -138,7 +185,7 @@ export default function FileUploader() {
             </div>
           ) : csvData ? (
             <div>
-             <h3 className="font-medium mb-2">Preview</h3>
+              <h3 className="font-medium mb-2">Preview</h3>
               <div className="overflow-x-auto">
                 <table className="table-auto w-full border-collapse">
                   <thead>
@@ -178,9 +225,13 @@ export default function FileUploader() {
               <div className="mt-8">
                 <Tabs defaultValue="table">
                   <div>
-                  {
-                    headers.length > 1 && 
-                    <DataCharts key={file.name} data={csvData} headers={headers} />}
+                    {headers.length > 1 && (
+                      <DataCharts
+                        key={file.name}
+                        data={csvData}
+                        headers={headers}
+                      />
+                    )}
                   </div>
                   <TabsContent value="table" className="mt-4">
                     <DataTable data={csvData} headers={headers} />
